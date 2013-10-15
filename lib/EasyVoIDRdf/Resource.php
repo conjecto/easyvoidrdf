@@ -38,7 +38,7 @@
 /**
  * SPIN namespaces registering
  */
-EasyVoIDRdf_Utils::sesetAtTypeMappers();
+EasyVoIDRdf_Utils::setTypeMappers();
 
 /**
  * Abstract class that represents an SPIN resource

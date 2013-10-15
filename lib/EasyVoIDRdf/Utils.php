@@ -43,7 +43,7 @@ class EasyVoIDRdf_Utils
         EasyRdf_Namespace::set('void', 'http://rdfs.org/ns/void#');
 
         // mapper
-        EasyRdf_TypeMapper::set('void:Dataset', 'EasyVoidRdf_Dataset');
-        EasyRdf_TypeMapper::set('void:Linkset', 'EasyVoidRdf_Linkset');
+        EasyRdf_TypeMapper::set('void:Dataset', 'EasyVoIDRdf_Dataset');
+        EasyRdf_TypeMapper::set('void:Linkset', 'EasyVoIDRdf_Linkset');
     }
 }

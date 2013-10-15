@@ -44,5 +44,77 @@
  */
 class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
 {
+    /**
+     * Load the graph from void:dataDump
+     */
+    function loadDataDumpGraph()
+    {
+        $dataDumps = $this->all('void:dataDump');
+        if($dataDumps) {
+            $graph = new EasyRdf_Graph();
+            foreach($dataDumps as $dump) {
+                if(preg_match("/^http:/", $dump)) {
+                    $graph->load($dump);
+                } else {
+                    $graph->parseFile($dump);
+                }
+            }
+            return $graph;
+        } else {
+            return false;
+        }
+    }
 
+    /**
+     * Check URIspage or regex to compare given URI
+     * @param $uri
+     * @return bool
+     */
+    function uriMatch($uri)
+    {
+        // void:uriSpace
+        $spaces = $this->all('void:uriSpace');
+        foreach($spaces as $space) {
+            if(preg_match("/^".preg_quote($space->getValue(), "/")."/", $uri))
+                return true;
+        }
+        // void:uriRegexPattern
+        $regexPatterns = $this->all('void:uriRegexPattern');
+        foreach($regexPatterns as $regexPattern) {
+            if(preg_match("/".$regexPattern."/", $uri))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * lookup
+     * @param $uri
+     * @return EasyRdf_Graph
+     */
+    function lookup($uri)
+    {
+        // void:uriLookupEndpoint
+        $uriLookupEndpoint = $this->get('void:uriLookupEndpoint');
+        if($uriLookupEndpoint) {
+            // @todo
+        }
+
+        // void:sparqlEndpoint
+        $sparqlEndpoint = $this->get('void:sparqlEndpoint');
+        if($sparqlEndpoint) {
+            $query = 'DESCRIBE <'.$uri.'>';
+            //$query = 'DESCRIBE <'.$uri.'> { <http://www.bigdata.com/queryHints#Query> <http://www.bigdata.com/queryHints#describeMode> "CBD" }';
+            $client = new \EasyRdf_Sparql_Client($sparqlEndpoint);
+            return $client->query($query);
+        }
+
+        // void:dataDump
+        $graph = $this->loadDataDumpGraph();
+        if($graph) {
+            return $graph->resource($uri);
+        }
+
+        return false;
+    }
 }
