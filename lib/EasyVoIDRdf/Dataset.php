@@ -47,7 +47,7 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
     /**
      * Load the graph from void:dataDump
      */
-    function loadDataDumpGraph()
+   protected function loadDataDumpGraph()
     {
         $dataDumps = $this->all('void:dataDump');
         if($dataDumps) {
@@ -70,7 +70,7 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
      * @param $uri
      * @return bool
      */
-    function uriMatch($uri)
+    public function uriMatch($uri)
     {
         // void:uriSpace
         $spaces = $this->all('void:uriSpace');
@@ -88,11 +88,26 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
     }
 
     /**
+     * Initialize a SPARQL Client
+     * @return EasyRdf_Sparql_Client
+     * @throws Exception
+     */
+    protected function getSparqlClient()
+    {
+        $sparqlEndpoint = $this->get('void:sparqlEndpoint');
+        if(!$sparqlEndpoint) {
+            throw new Exception('You cannot perform SPARQL query on dataset without a sparqlEndpoint property.');
+        }
+        $client = new EasyRdf_Sparql_Client($sparqlEndpoint);
+        return $client;
+    }
+
+    /**
      * lookup
      * @param $uri
      * @return EasyRdf_Graph
      */
-    function lookup($uri)
+    public function lookup($uri)
     {
         // void:uriLookupEndpoint
         $uriLookupEndpoint = $this->get('void:uriLookupEndpoint');
@@ -124,13 +139,50 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
      * @return object
      * @throws Exception
      */
-    function query($sparql)
+    public function performQuery($sparql)
     {
-        $sparqlEndpoint = $this->get('void:sparqlEndpoint');
-        if(!$sparqlEndpoint) {
-            throw new Exception('You cannot perform SPARQL query on dataset without sparqlEndpoint !');
-        }
-        $client = new EasyRdf_Sparql_Client($sparqlEndpoint);
+        $client = $this->getSparqlClient();
         return $client->query($sparql);
+    }
+
+    /**
+     * Perform a SPARQL insert
+     * @param $insert Graph or query to insert
+     */
+    public function performInsert($insert = null)
+    {
+        $client = $this->getSparqlClient();
+        if($insert instanceof \EasyRdf_Graph) {
+            $sparql = "INSERT DATA { ".$insert->serialise("ntriples")." }";
+        } else {
+            $sparql = $insert;
+        }
+        return $client->update($sparql);
+    }
+
+    /**
+     * Perform a SPARQL delete
+     * @param $insert Graph or query to delete
+     */
+    public function performDelete($delete = null)
+    {
+        $client = $this->getSparqlClient();
+        if($delete instanceof \EasyRdf_Graph) {
+            $sparql = "DELETE DATA { ".$delete->serialise("ntriples")." }";
+        } else {
+            $sparql = $delete;
+        }
+        return $client->update($sparql);
+    }
+
+    /**
+     * Perform a SPARQL insert/delete
+     * @param $delete Graph or Query to delete
+     * @param $insert Graph or Query to insert
+     */
+    public function deleteInsert($delete = null, $insert = null)
+    {
+        $client = $this->getSparqlClient();
+        die("tst");
     }
 }
