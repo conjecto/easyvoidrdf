@@ -103,8 +103,8 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
         // void:sparqlEndpoint
         $sparqlEndpoint = $this->get('void:sparqlEndpoint');
         if($sparqlEndpoint) {
-            $query = 'DESCRIBE <'.$uri.'>';
-            //$query = 'DESCRIBE <'.$uri.'> { <http://www.bigdata.com/queryHints#Query> <http://www.bigdata.com/queryHints#describeMode> "CBD" }';
+            //$query = 'DESCRIBE <'.$uri.'>';
+            $query = 'DESCRIBE <'.$uri.'> { <http://www.bigdata.com/queryHints#Query> <http://www.bigdata.com/queryHints#describeMode> "CBD" }';
             $client = new \EasyRdf_Sparql_Client($sparqlEndpoint);
             return $client->query($query);
         }
@@ -116,5 +116,21 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
         }
 
         return false;
+    }
+
+    /**
+     * Perform a SPARQL query on the dataset
+     * @param $sparql
+     * @return object
+     * @throws Exception
+     */
+    function query($sparql)
+    {
+        $sparqlEndpoint = $this->get('void:sparqlEndpoint');
+        if(!$sparqlEndpoint) {
+            throw new Exception('You cannot perform SPARQL query on dataset without sparqlEndpoint !');
+        }
+        $client = new EasyRdf_Sparql_Client($sparqlEndpoint);
+        return $client->query($sparql);
     }
 }
