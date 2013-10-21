@@ -45,6 +45,6 @@ class EasyVoIDRdf_Utils
         // mapper
         EasyRdf_TypeMapper::set('void:Dataset', 'EasyVoIDRdf_Dataset');
         EasyRdf_TypeMapper::set('void:Linkset', 'EasyVoIDRdf_Linkset');
-        EasyRdf_TypeMapper::set('void:Dataset_Bigdata', 'EasyVoIDRdf_Dataset_Bigdata');
+        EasyRdf_TypeMapper::set('void:Dataset_Bigdata', 'EasyVoIDRdf_Dataset_BigdataDataset');
     }
 }

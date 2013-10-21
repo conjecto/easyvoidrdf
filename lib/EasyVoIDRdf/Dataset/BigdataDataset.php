@@ -6,8 +6,10 @@
 /**
  * Specific Dataset class for BigData
  */
-class EasyVoIDRdf_Dataset_Bigdata extends EasyVoIDRdf_Dataset
+class EasyVoIDRdf_Dataset_BigdataDataset extends EasyVoIDRdf_Dataset
 {
+    const DESCRIBE_QUERY = 'DESCRIBE <uri> { <http://www.bigdata.com/queryHints#Query> <http://www.bigdata.com/queryHints#describeMode> "CBD" }';
+
     /**
      * Prepare a specific http client
      *
@@ -32,7 +34,6 @@ class EasyVoIDRdf_Dataset_Bigdata extends EasyVoIDRdf_Dataset
         foreach($params as $name => $value) {
             $client->setParameterGet($name, $value);
         }
-        $client->setHeaders('Content-Type', 'text/turtle');
         return $client;
     }
 
@@ -56,29 +57,38 @@ class EasyVoIDRdf_Dataset_Bigdata extends EasyVoIDRdf_Dataset
     /**
      * {@inheritdoc}
      */
-    public function performDelete($delete = null)
+    public function update($query)
     {
-        if($delete instanceof \EasyRdf_Graph) {
-            $client = $this->getHttpClient('POST', array('delete' => '1'));
-            $client->setRawData($delete->serialise('turtle'));
-        } else {
-            $client = $this->getHttpClient('DELETE', array('query' => $delete));
+        // Check for undefined prefixes
+        $prefixes = '';
+        foreach (EasyRdf_Namespace::namespaces() as $prefix => $uri) {
+            if (strpos($query, "$prefix:") !== false and
+              strpos($query, "PREFIX $prefix:") === false) {
+                $prefixes .=  "PREFIX $prefix: <$uri>\n";
+            }
         }
+        $client = $this->getHttpClient('POST', array('update' => $prefixes . $query));
+        $client->setHeaders('Content-Length', 0);
         return $this->performHttpRequest($client);
     }
 
     /**
      * {@inheritdoc}
+     * @see http://sourceforge.net/apps/mediawiki/bigdata/index.php?title=NanoSparqlServer
      */
-    public function performInsert($insert = null)
+    public function updateData($operation, EasyRdf_Graph $data, $graphUri = null)
     {
-        if($insert instanceof \EasyRdf_Graph) {
-            $client = $this->getHttpClient('POST');
-            $client->setRawData($insert->serialise('turtle'));
-        } else {
-            $sparql = "INSERT DATA { ".$insert->serialise("ntriples")." }";
-            $client = $this->getHttpClient('POST', array('update' => $sparql));
+        if($operation == "delete") {
+            $client = $this->getHttpClient('POST', array('delete' => '1'));
+            $client->setRawData($this->convertToTriples($data));
+            $client->setHeaders('Content-Type', 'text/plain');
+            return $this->performHttpRequest($client);
         }
-        return $this->performHttpRequest($client);
+        elseif($operation == "insert") {
+            $client = $this->getHttpClient('POST');
+            $client->setRawData($this->convertToTriples($data));
+            $client->setHeaders('Content-Type', 'text/plain');
+            return $this->performHttpRequest($client);
+        }
     }
 }
