@@ -199,7 +199,8 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
         // void:dataDump
         $graph = $this->loadDataDumpGraph();
         if($graph) {
-            return $graph->resource($uri);
+            $resourceGraph = $graph->resourceGraph($uri);
+            return $resourceGraph->resource($uri);
         }
 
         return false;
