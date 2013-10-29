@@ -54,7 +54,7 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
     {
         $dataDumps = $this->all('void:dataDump');
         if($dataDumps) {
-            $graph = new EasyRdf_Graph($this->getUri());
+            $graph = new EasyVoIDRdf_Graph($this->getUri());
             foreach($dataDumps as $dump) {
                 if(preg_match("/^http:/", $dump)) {
                     $graph->load($dump);
