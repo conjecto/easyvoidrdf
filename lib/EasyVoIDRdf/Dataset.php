@@ -108,6 +108,16 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
     }
 
     /**
+     * Optimize a SPARQL query
+     * @param $query
+     * @return string
+     */
+    public function optimizeQuery($query)
+    {
+        return $query;
+    }
+
+    /**
      * Perform a SPARQL query on the dataset
      * @param $query
      * @return object
@@ -115,6 +125,7 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
      */
     public function query($query)
     {
+        $query = $this->optimizeQuery($query);
         return $this->getSparqlClient()->query($query);
     }
 
@@ -126,6 +137,7 @@ class EasyVoIDRdf_Dataset extends EasyVoIDRdf_Resource
      */
     public function update($query)
     {
+        $query = $this->optimizeQuery($query);
         return $this->getSparqlClient()->update($query);
     }
 

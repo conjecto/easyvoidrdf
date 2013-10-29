@@ -91,4 +91,15 @@ class EasyVoIDRdf_Dataset_BigdataDataset extends EasyVoIDRdf_Dataset
             return $this->performHttpRequest($client);
         }
     }
+
+    /**
+     * Optimize a SPARQL query
+     * @param $query
+     * @return string
+     */
+    public function optimizeQuery($query)
+    {
+        // NamedSubquery : http://sourceforge.net/apps/mediawiki/bigdata/index.php?title=NamedSubquery
+        return $query;
+    }
 }
