@@ -18,8 +18,8 @@ class EasyVoIDRdf_Graph extends EasyRdf_Graph
         $newResource = new $resClass($uri, $resourceGraph);
 
         $copyProperties = function($resource, &$newResource) use ($resourceGraph, &$copyProperties) {
-            foreach($resource->properties() as $property) {
-                $values = $resource->all($property);
+            foreach($resource->propertyUris() as $property) {
+                $values = $resource->all('<'.$property.'>');
                 foreach($values as $value) {
                     $newResource->add($property, $value);
                     if($value instanceof \EasyRdf_Resource && $value->isBNode()) {
